@@ -1,0 +1,9 @@
+[alias]
+psx_build = ["build", "-Zbuild-std=core", "-Zbuild-std-features=compiler-builtins-mem", "--target", "mipsel-sony-psx"]
+psx_check = ["check", "-Zbuild-std=core", "-Zbuild-std-features=compiler-builtins-mem", "--target", "mipsel-sony-psx"]
+psx_clean = ["clean",                                                                   "--target", "mipsel-sony-psx"]
+# cargo +psx psx_rustc --bin puddle-app --release -- --emit asm
+psx_rustc = ["rustc", "-Zbuild-std=core", "-Zbuild-std-features=compiler-builtins-mem", "--target", "mipsel-sony-psx"]
+
+[target.mipsel-sony-psx]
+rustflags = ["-C", "lto=true", "-C", "embed-bitcode=yes", "-C", "codegen-units=1", "-Clink-arg=-Tps-exe.ld", "-Clink-args=-Map=target/app.map", "-Clink-arg=--oformat=binary"]

@@ -1,0 +1,49 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "build",
+                "type": "shell",
+                "command": "cargo",
+                "args": ["+nightly", "psx_build", "--release"],
+                "problemMatcher": [],
+                "presentation": {
+                    "reveal": "always"
+                },
+                "group": "build",
+            },
+            {
+                "label": "check",
+                "type": "shell",
+                "command": "cargo",
+                "args": ["+nightly", "psx_check", "--release"],
+                "problemMatcher": [],
+                "presentation": {
+                    "reveal": "always"
+                },
+                "group": "build",
+            }
+        ],
+    },
+    "settings": {
+        "files.exclude": {
+            "**/.git": true,
+            "tools": true,
+        },
+        "rust-analyzer.server.extraEnv": {
+            "RUSTUP_TOOLCHAIN": "nightly"
+        },
+        "rust-analyzer.cargo.target": "mipsel-sony-psx",
+        "rust-analyzer.cargo.allTargets": false,
+        "rust-analyzer.cargo.extraArgs": [
+            "-Zbuild-std=core",
+            "-Zbuild-std-features=compiler-builtins-mem"
+        ]
+    }
+}
