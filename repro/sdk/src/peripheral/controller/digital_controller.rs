@@ -1,4 +1,4 @@
-use crate::peripheral::{CONTROLLERS_A, CONTROLLERS_B, RawController, controller::{ControllerError, ControllerType, GenericButton}};
+use crate::peripheral::{CONTROLLERS_A, CONTROLLERS_B, RawController, controller::{ControllerError, ControllerType}};
 
 /// The regular digital PSX controller
 pub struct DigitalController {
@@ -28,7 +28,7 @@ impl DigitalController {
     /// 
     /// Returns: `true` if the button was pressed
     pub fn is_button_down(&self, button: DigitalButton) -> bool {
-        unsafe {(*self.raw).buttons.is_down(GenericButton::from(button))}
+        unsafe {(*self.raw).buttons.is_down(button)}
     }
 
     /// Tries to use the controller on port A or B as a digital controller
@@ -40,9 +40,9 @@ impl DigitalController {
     fn from_port(use_port_a: bool) -> Result<DigitalController, ControllerError> {
         let slot = if use_port_a {unsafe{&raw mut CONTROLLERS_A[0]}} else {unsafe{&raw mut CONTROLLERS_B[0]}};
 
-        if let Some(raw) = unsafe{&**slot} {
+        if let Some(raw) = unsafe{&slot.as_ref_unchecked().controller} {
             let controller_type = raw.get_controller_type();
-            if matches!(controller_type, ControllerType::Controller) {
+            if matches!(controller_type, ControllerType::Unknown) {
                 Ok(DigitalController{raw})
             }
 
@@ -91,27 +91,4 @@ pub enum DigitalButton {
     Cross,
     /// The `square` button on a regular controller - this is the left button of the character buttons
     Square,
-}
-
-impl From::<DigitalButton> for GenericButton {
-    fn from(value: DigitalButton) -> Self {
-        match value {
-            DigitalButton::L2       => GenericButton::D0,
-            DigitalButton::R2       => GenericButton::D1,
-            DigitalButton::L1       => GenericButton::D2,
-            DigitalButton::R1       => GenericButton::D3,
-            DigitalButton::Triangle => GenericButton::D4,
-            DigitalButton::Circle   => GenericButton::D5,
-            DigitalButton::Cross    => GenericButton::D6,
-            DigitalButton::Square   => GenericButton::D7,
-            DigitalButton::Select   => GenericButton::D8,
-            DigitalButton::L3       => GenericButton::D9,
-            DigitalButton::R3       => GenericButton::D10,
-            DigitalButton::Start    => GenericButton::D11,
-            DigitalButton::Up       => GenericButton::D12,
-            DigitalButton::Right    => GenericButton::D13,
-            DigitalButton::Down     => GenericButton::D14,
-            DigitalButton::Left     => GenericButton::D15,
-        }
-    }
 }

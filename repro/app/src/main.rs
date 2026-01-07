@@ -1,9 +1,8 @@
 #![no_std]
 #![no_main]
 
-use sdk::{peripheral::{controller::digital_controller::{DigitalButton, DigitalController}, update_controller}, psx::bios::busy_wait};
+use sdk::{busy_wait, peripheral::{controller::digital_controller::{DigitalButton, DigitalController}, update_controller}};
 
-/// The update routine which currently only renders strings
 fn update<'a>() {
     let _no_controller = match DigitalController::from_port_a() {
         Ok(controller) => {
@@ -21,8 +20,6 @@ fn update<'a>() {
             false            
         },
         Err(_error) => {
-            // TODO: Remove before PR
-            //println!("Error: {:?}", error);
             true
         }
     };
