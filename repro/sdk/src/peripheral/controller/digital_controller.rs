@@ -1,4 +1,4 @@
-use crate::peripheral::{CONTROLLERS_A, CONTROLLERS_B, RawController, controller::{ControllerError, ControllerType}};
+use crate::peripheral::{CONTROLLERS_A, RawController, controller::{ControllerError, ControllerType}};
 
 /// The regular digital PSX controller
 pub struct DigitalController {
@@ -11,14 +11,7 @@ impl DigitalController {
     /// 
     /// Returns: On success an `Ok` with the `DigitalController` otherwise an `Err`
     pub fn from_port_a() -> Result<DigitalController, ControllerError> {
-        Self::from_port(true)
-    }
-
-    /// Tries to use the controller on port B, slot 1 as a digital controller
-    /// 
-    /// Returns: On success an `Ok` with the `DigitalController` otherwise an `Err`
-    pub fn from_port_b() -> Result<DigitalController, ControllerError>{
-        Self::from_port(false)
+        Self::from_port()
     }
 
     /// Checks if the specified `DigitalButton` `button` was pressed or not
@@ -37,8 +30,8 @@ impl DigitalController {
     /// * `use_port_a`: `true` to use port A otherwise B will be used
     /// 
     /// Returns: On success an `Ok` with the `DigitalController` otherwise an `Err`
-    fn from_port(use_port_a: bool) -> Result<DigitalController, ControllerError> {
-        let slot = if use_port_a {unsafe{&raw mut CONTROLLERS_A[0]}} else {unsafe{&raw mut CONTROLLERS_B[0]}};
+    fn from_port() -> Result<DigitalController, ControllerError> {
+        let slot = {unsafe{&raw mut CONTROLLERS_A[0]}};
 
         if let Some(raw) = unsafe{&slot.as_ref_unchecked().controller} {
             let controller_type = raw.get_controller_type();

@@ -30,6 +30,7 @@ impl SerialConnection {
     }
 
     fn exchange_byte(&self, _byte: u8) -> u8 {
+        // Actual serial IO port, but not configured. Should return 255 always.
         unsafe{read_volatile(0x1F801040 as *const u8)}
     }
 }

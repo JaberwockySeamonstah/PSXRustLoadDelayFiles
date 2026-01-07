@@ -9,7 +9,6 @@ pub use controller::RawController;
 const CONTROLLER_SLOT_COUNT:usize = 1;
 
 static mut CONTROLLERS_A: [ControllerSlot; CONTROLLER_SLOT_COUNT] = [const {ControllerSlot::new()}; CONTROLLER_SLOT_COUNT];
-static mut CONTROLLERS_B: [ControllerSlot; CONTROLLER_SLOT_COUNT] = [const {ControllerSlot::new()}; CONTROLLER_SLOT_COUNT];
 
 pub struct ControllerSlot {
     controller:    Option<RawController>,
@@ -32,6 +31,7 @@ pub fn update_controller() {
 }
 
 fn process_port(serial_connection: &mut SerialConnection, port_slots: &mut [ControllerSlot; CONTROLLER_SLOT_COUNT]) {
+    //>>> Working <<<
     //for idx in 0..CONTROLLER_SLOT_COUNT {
     //    let slot = &mut port_slots[idx];
     //    process_controller(serial_connection, &mut slot.controller, &slot.configuration);
@@ -42,6 +42,7 @@ fn process_port(serial_connection: &mut SerialConnection, port_slots: &mut [Cont
         process_controller(serial_connection, &mut slot.controller, &slot.configuration);
     }
 }
+
 
 fn process_controller(serial_connection: &mut SerialConnection, controller: &mut Option<RawController>, configuration: &Option<Configuration>) {
     if let Some(existing_controller) = controller {
@@ -57,6 +58,10 @@ fn process_existing_controller(serial_connection: &mut SerialConnection, control
             if configuration.is_some() {
                 // If you see this, then it worked
                 unsafe{printf(b"Good!\n\0".as_ptr())};
+            }
+            
+            else {
+                unsafe{printf(b"Bad...\n\0".as_ptr())};
             }
             Ok(())
         },
