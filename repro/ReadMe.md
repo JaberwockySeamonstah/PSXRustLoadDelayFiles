@@ -96,4 +96,6 @@ this can be changed in many ways. Virtually anything that makes use of `configur
 
 Changing the [read_volatile](sdk/src/peripheral/serial_connection.rs#L34) usage to just return a static number also causes the issue to vanish, but likely only due to significant optimization changes.
 
-Written by the monochrome tiger @cody-code-wy
+# Credits
+
+Written by the monochrome tiger [@cody-code-wy](https://github.com/cody-code-wy)
