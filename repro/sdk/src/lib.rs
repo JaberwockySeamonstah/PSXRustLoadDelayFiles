@@ -6,12 +6,32 @@
 
 pub mod peripheral;
 
+#[cfg(target_arch="riscv64")]
+mod riscv_startup;
+
 use core::{arch::{asm, global_asm}, panic::PanicInfo};
 
+#[cfg(target_arch="mips")]
 global_asm!(include_str!("printf.s"));
+#[cfg(target_arch="mips")]
 unsafe extern "C" {
     #[link_name = "tty_printf"]
     pub fn printf(str: *const u8, ...) -> i32;
+}
+
+#[cfg(target_arch="riscv64")]
+pub unsafe fn printf(mut str: *const u8) -> i32 {
+    use crate::riscv_startup::put_char;
+    use core::ffi::c_char;
+
+    unsafe {
+        while *str != 0 {
+            put_char(*str as c_char);
+            str = str.add(1);
+        }
+    }
+
+    0
 }
 
 #[optimize(size)]

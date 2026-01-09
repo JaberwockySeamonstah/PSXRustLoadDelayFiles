@@ -31,6 +31,10 @@ impl SerialConnection {
 
     fn exchange_byte(&self, _byte: u8) -> u8 {
         // Actual serial IO port, but not configured. Should return 255 always.
+        #[cfg(target_arch="riscv64")]
+        unsafe{read_volatile(0x1000_0000 as *const u8)}
+
+        #[cfg(target_arch="mips")]
         unsafe{read_volatile(0x1F801040 as *const u8)}
     }
 }

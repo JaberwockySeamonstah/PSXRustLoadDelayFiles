@@ -26,9 +26,9 @@ The `sdk` crate represents a rust native PlayStation 1 SDK with the minimal feat
 
 ##### [lib.rs](sdk/src/lib.rs)
 
-The SDK includes the [entrypoint](sdk/src/lib.rs#L26) of the application which launches the [main](app/src/main.rs#L30) from `app` described later.
+The SDK includes the [entrypoint](sdk/src/lib.rs#L46) of the application which launches the [main](app/src/main.rs#L30) from `app` described later.
 
-The main [lib.rs](sdk/src/lib.rs) also includes the [panic handler](sdk/src/lib.rs#L36), a [busy wait](sdk/src/lib.rs#L18), and the forward declaration of [printf](sdk/src/lib.rs#L14) (implemented in [printf.s](sdk/src/printf.s))
+The main [lib.rs](sdk/src/lib.rs) also includes the [panic handler](sdk/src/lib.rs#L57), a [busy wait](sdk/src/lib.rs#L38), and the forward declaration of [printf](sdk/src/lib.rs#L19) (implemented in [printf.s](sdk/src/printf.s))
 
 #### peripheral
 
@@ -38,7 +38,7 @@ The peripheral module incudes the code that wold interface with external periphe
 
 This handles managing the IO port for serial communication, the nature of the bug does not require interaction with external devices, and therefor all actual interaction as been reduced to the absolute minimum and does not require any actual controller.
 
-It does still require a [volatile read](sdk/src/peripheral/serial_connection.rs#L34) of the controller IO port to reproduce. We assume this requirement is due to compiler optimization.
+It does still require a [volatile read](sdk/src/peripheral/serial_connection.rs#L38) of the controller IO port to reproduce. We assume this requirement is due to compiler optimization.
 
 ##### [peripheral/controller/mod.rs](sdk/src/peripheral/controller/mod.rs)
 
