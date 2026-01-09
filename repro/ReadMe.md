@@ -96,6 +96,11 @@ this can be changed in many ways. Virtually anything that makes use of `configur
 
 Changing the [read_volatile](sdk/src/peripheral/serial_connection.rs#L34) usage to just return a static number also causes the issue to vanish, but likely only due to significant optimization changes.
 
+# Additional observations
+
+- The same code works properly when run against the RISC-V target (try `cargo +nightly riscv_run -r` with qemu installed)
+- Use of [SyncUnsafeCell](https://doc.rust-lang.org/beta/core/cell/struct.SyncUnsafeCell.html) exibits the same behavior.
+
 # Credits
 
 Written by the monochrome tiger [@cody-code-wy](https://github.com/cody-code-wy)
