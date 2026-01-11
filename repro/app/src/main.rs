@@ -22,13 +22,13 @@ const CONTROLLER_SLOT_COUNT:usize = 1;
 pub static mut CONTROLLERS_A: [ControllerSlot; CONTROLLER_SLOT_COUNT] = [const {ControllerSlot::new()}; CONTROLLER_SLOT_COUNT];
 
 pub struct ControllerSlot {
-    wrapper: Option<Wrapper>,
+    wrapper: Option<State>,
     value:   Option<u8>,
 }
 
 impl ControllerSlot {
     const fn new() -> ControllerSlot {
-        ControllerSlot{wrapper: Some(Wrapper{state: State::New}), value: Some(0)}
+        ControllerSlot{wrapper: Some(State::New), value: Some(0)}
     }
 }
 
@@ -43,19 +43,19 @@ pub fn update_controller() {
 }
 
 fn process_port(dummy: &mut Dummy, port_slots: &mut [ControllerSlot; CONTROLLER_SLOT_COUNT]) {
-    // >>> Working <<<
-    //for idx in 0..CONTROLLER_SLOT_COUNT {
-    //    let slot = &mut port_slots[idx];
-    //    process_controller(dummy, &mut slot.wrapper, &slot.value);
-    //}
-
-    //>>> All bad <<<
-    for slot in port_slots.iter_mut() {
+    // Both of them are now not working
+    for idx in 0..CONTROLLER_SLOT_COUNT {
+        let slot = &mut port_slots[idx];
         process_controller(dummy, &mut slot.wrapper, &slot.value);
     }
+
+    //// Both of them are now not working
+    //for slot in port_slots.iter_mut() {
+    //    process_controller(dummy, &mut slot.wrapper, &slot.value);
+    //}
 }
 
-fn process_controller(dummy: &mut Dummy, wrapper: &mut Option<Wrapper>, value: &Option<u8>) {
+fn process_controller(dummy: &mut Dummy, wrapper: &mut Option<State>, value: &Option<u8>) {
     if let Some(existing_controller) = wrapper {
         if let Err(_) = process_existing_controller(dummy, existing_controller, value) {
             *wrapper = None;
@@ -63,8 +63,8 @@ fn process_controller(dummy: &mut Dummy, wrapper: &mut Option<Wrapper>, value: &
     }
 }
 
-fn process_existing_controller(dummy: &mut Dummy, wrapper: &mut Wrapper, value: &Option<u8>) -> Result<(), ()> {
-    match wrapper.state {
+fn process_existing_controller(dummy: &mut Dummy, wrapper: &mut State, value: &Option<u8>) -> Result<(), ()> {
+    match wrapper {
         State::New    => {
             if value.is_some() {
                 // If you see this, then it worked
@@ -78,11 +78,12 @@ fn process_existing_controller(dummy: &mut Dummy, wrapper: &mut Wrapper, value: 
         },
         State::InConfigMode(current_config) => {
             if let Some(requested_config) = value {
-                if current_config != *requested_config {
+                if *current_config != *requested_config {
                     return Ok(());
                 }
             } 
             
+            // Removing the following line fixes it
             core::hint::black_box(dummy);
             Ok(())
         }
@@ -90,10 +91,6 @@ fn process_existing_controller(dummy: &mut Dummy, wrapper: &mut Wrapper, value: 
 }
 
 // =====================================================================================
-
-pub struct Wrapper {
-    state: State,
-}
 
 #[derive(Debug, Clone, Copy)]
 enum State {
