@@ -22,13 +22,13 @@ const CONTROLLER_SLOT_COUNT:usize = 1;
 pub static mut CONTROLLERS_A: [ControllerSlot; CONTROLLER_SLOT_COUNT] = [const {ControllerSlot::new()}; CONTROLLER_SLOT_COUNT];
 
 pub struct ControllerSlot {
-    controller:    Option<RawController>,
-    configuration: Option<u8>,
+    wrapper: Option<Wrapper>,
+    value:   Option<u8>,
 }
 
 impl ControllerSlot {
     const fn new() -> ControllerSlot {
-        ControllerSlot{controller: Some(RawController{state: State::New}), configuration: Some(0)}
+        ControllerSlot{wrapper: Some(Wrapper{state: State::New}), value: Some(0)}
     }
 }
 
@@ -44,30 +44,29 @@ pub fn update_controller() {
 
 fn process_port(dummy: &mut Dummy, port_slots: &mut [ControllerSlot; CONTROLLER_SLOT_COUNT]) {
     // >>> Working <<<
-    // for idx in 0..CONTROLLER_SLOT_COUNT {
-    //     let slot = &mut port_slots[idx];
-    //     process_controller(dummy, &mut slot.controller, &slot.configuration);
-    // }
+    //for idx in 0..CONTROLLER_SLOT_COUNT {
+    //    let slot = &mut port_slots[idx];
+    //    process_controller(dummy, &mut slot.wrapper, &slot.value);
+    //}
 
     //>>> All bad <<<
     for slot in port_slots.iter_mut() {
-        process_controller(dummy, &mut slot.controller, &slot.configuration);
+        process_controller(dummy, &mut slot.wrapper, &slot.value);
     }
 }
 
-
-fn process_controller(dummy: &mut Dummy, controller: &mut Option<RawController>, configuration: &Option<u8>) {
-    if let Some(existing_controller) = controller {
-        if let Err(_) = process_existing_controller(dummy, existing_controller, configuration) {
-            *controller = None;
+fn process_controller(dummy: &mut Dummy, wrapper: &mut Option<Wrapper>, value: &Option<u8>) {
+    if let Some(existing_controller) = wrapper {
+        if let Err(_) = process_existing_controller(dummy, existing_controller, value) {
+            *wrapper = None;
         }
     }
 }
 
-fn process_existing_controller(dummy: &mut Dummy, controller: &mut RawController, configuration: &Option<u8>) -> Result<(), ()> {
-    match controller.state {
+fn process_existing_controller(dummy: &mut Dummy, wrapper: &mut Wrapper, value: &Option<u8>) -> Result<(), ()> {
+    match wrapper.state {
         State::New    => {
-            if configuration.is_some() {
+            if value.is_some() {
                 // If you see this, then it worked
                 unsafe{printf(b"Good!\n\0".as_ptr())};
             }
@@ -78,7 +77,7 @@ fn process_existing_controller(dummy: &mut Dummy, controller: &mut RawController
             Ok(())
         },
         State::InConfigMode(current_config) => {
-            if let Some(requested_config) = configuration {
+            if let Some(requested_config) = value {
                 if current_config != *requested_config {
                     return Ok(());
                 }
@@ -92,7 +91,7 @@ fn process_existing_controller(dummy: &mut Dummy, controller: &mut RawController
 
 // =====================================================================================
 
-pub struct RawController {
+pub struct Wrapper {
     state: State,
 }
 
@@ -135,13 +134,6 @@ pub unsafe fn printf(mut str: *const u8) -> i32 {
     }
 
     0
-}
-
-#[optimize(size)]
-pub fn busy_wait(cycles: usize) {
-    for _ in 0..cycles {
-        unsafe{asm!("nop")};
-    }
 }
 
 #[panic_handler]
