@@ -4,7 +4,7 @@
 #![feature(unsafe_cell_access)]
 #![feature(ptr_as_ref_unchecked)]
 
-pub mod peripheral;
+//pub mod peripheral;
 
 #[cfg(target_arch="riscv64")]
 mod riscv_startup;
