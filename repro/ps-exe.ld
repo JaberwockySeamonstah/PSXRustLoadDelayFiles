@@ -21,7 +21,7 @@ SECTIONS {
         /* Unused */
         QUAD(0);
         /* Initial PC */
-        LONG(ABSOLUTE(__startup));
+        LONG(ABSOLUTE(main));
         /* Initial GP/R28 */
         LONG(_gp);
         /* Load address */

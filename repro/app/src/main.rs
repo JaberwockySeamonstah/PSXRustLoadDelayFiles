@@ -6,12 +6,13 @@
 #![no_main]
 
 #[unsafe(no_mangle)]
-pub fn main() {
-    loop {
-        core::hint::black_box(unsafe{&raw mut CONTROLLERS_A[0]});
-        update_controller();
-        busy_wait(500*1000);
-    }
+extern "C" fn main() {
+    update_controller();
+    core::hint::black_box(unsafe{&raw mut CONTROLLERS_A[0]});
+
+    // Prevent end of `main`
+    // Not needed for bug
+    loop {}
 }
 
 // =======================================================================================
@@ -141,18 +142,6 @@ pub fn busy_wait(cycles: usize) {
     for _ in 0..cycles {
         unsafe{asm!("nop")};
     }
-}
-
-/// The entry point for every PSX application
-#[unsafe(no_mangle)]
-extern "C" fn __startup() {
-    unsafe extern "Rust" {fn main();}
-
-    unsafe{
-        main();
-        printf(b"Unexpected end of main\n\0".as_ptr());
-    };
-    loop {};
 }
 
 #[panic_handler]
