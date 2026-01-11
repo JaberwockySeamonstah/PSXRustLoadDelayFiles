@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["app", "sdk"]
+members = ["app"]
 
 [profile.release]
 panic = "abort"
