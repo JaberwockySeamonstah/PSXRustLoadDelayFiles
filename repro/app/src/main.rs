@@ -32,38 +32,34 @@ impl ControllerSlot {
     }
 }
 
-pub struct Dummy {
-} 
-
 #[allow(static_mut_refs)]
 #[inline(never)]
 pub fn update_controller() {
-    let mut serial_connection = Dummy{};
-    process_port(&mut serial_connection, unsafe{&mut CONTROLLERS_A});
+    process_port(unsafe{&mut CONTROLLERS_A});
 }
 
-fn process_port(dummy: &mut Dummy, port_slots: &mut [ControllerSlot; CONTROLLER_SLOT_COUNT]) {
+fn process_port(port_slots: &mut [ControllerSlot; CONTROLLER_SLOT_COUNT]) {
     // >>> Working <<<
     //for idx in 0..CONTROLLER_SLOT_COUNT {
     //    let slot = &mut port_slots[idx];
-    //    process_controller(dummy, &mut slot.wrapper, &slot.value);
+    //    process_controller(&mut slot.wrapper, &slot.value);
     //}
 
     //>>> All bad <<<
     for slot in port_slots.iter_mut() {
-        process_controller(dummy, &mut slot.wrapper, &slot.value);
+        process_controller(&mut slot.wrapper, &slot.value);
     }
 }
 
-fn process_controller(dummy: &mut Dummy, wrapper: &mut Option<Wrapper>, value: &Option<u8>) {
+fn process_controller(wrapper: &mut Option<Wrapper>, value: &Option<u8>) {
     if let Some(existing_controller) = wrapper {
-        if let Err(_) = process_existing_controller(dummy, existing_controller, value) {
+        if let Err(_) = process_existing_controller(existing_controller, value) {
             *wrapper = None;
         }
     }
 }
 
-fn process_existing_controller(dummy: &mut Dummy, wrapper: &mut Wrapper, value: &Option<u8>) -> Result<(), ()> {
+fn process_existing_controller(wrapper: &mut Wrapper, value: &Option<u8>) -> Result<(), ()> {
     match wrapper.state {
         State::New    => {
             if value.is_some() {
@@ -83,7 +79,7 @@ fn process_existing_controller(dummy: &mut Dummy, wrapper: &mut Wrapper, value: 
                 }
             } 
             
-            core::hint::black_box(dummy);
+            core::hint::black_box(());
             Ok(())
         }
     }
