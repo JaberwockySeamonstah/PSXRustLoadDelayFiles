@@ -14,14 +14,11 @@
    2. In the `Advanced` tab ensure `Log to Window` is checked and logging level is at least `Information`
    3. You should see a Log Window.
 5. In DuckStation click `Start File` and select the `app.exe` from earlier.
-6. In a good case the console will be spammed with `Good!` and in a non-working case it will spam `Bad...`
+6. In a good case the console will not show anything special, in a bad case it shows `W(RaiseBreakException): PCDrv is not enabled, break HLE will not be executed.`
 
 # Repo Files
 
 This reproduction uses a single crate with a single rust file and a single asm file (only needed on playstation)
-
-The [printf.s](app/src/printf.s) invokes the BIOS printf from the playstation 1 bios, but does not seem to be related to the bug, just needed for output.
-
 
 # Known changes to effect bug behavior
 
@@ -33,19 +30,15 @@ This can be changed to any number greater than 1 which will cause the issue to v
 
 ## [process_port](app/src/main.rs#L45)
 
-Normally this can be changed to avoid using `iter_mut` by uncommenting [lines 46-50](app/src/main.rs#L46-L50) and commenting out [lines 53-55](app/src/main.rs#L53-L55) would cause the issue disappear.
+Normally this can be changed to avoid using `iter_mut` by commenting out[lines 50-52](app/src/main.rs#L50-L52) and uncommenting [lines 44-47](app/src/main.rs#L44-L47) would cause the issue disappear.
 
 But this does not happen in this version of the code.
 
 ## [process_existing_controller](app/src/main.rs#L66)
 
-Removing the `black_box` hint on [line 86](app/src/main.rs#L86) will cause the issue to disappear.
-
-this can be changed in many ways. Virtually anything that makes use of `configuration` before or after [line 69](app/src/main.rs#L69) causes it to work as expected.
+Removing the `black_box` hint on [line 85](app/src/main.rs#L85) will cause the issue to disappear.
 
 # Additional observations
-
-- The same code works properly when run against the RISC-V target (try `cargo +nightly riscv_run -r` with qemu installed)
 - Use of [SyncUnsafeCell](https://doc.rust-lang.org/beta/core/cell/struct.SyncUnsafeCell.html) exhibits the same behavior.
 
 # Credits

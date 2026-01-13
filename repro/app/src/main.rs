@@ -3,6 +3,7 @@
 #![feature(optimize_attribute)]
 #![feature(unsafe_cell_access)]
 #![feature(ptr_as_ref_unchecked)]
+#![feature(core_intrinsics)]
 #![no_main]
 
 #[unsafe(no_mangle)]
@@ -63,12 +64,13 @@ fn process_existing_controller(wrapper: &mut State, value: &Option<u8>) -> Resul
     match wrapper {
         State::New    => {
             if value.is_some() {
-                // If you see this, then it worked
-                unsafe{printf(b"Good!\n\0".as_ptr())};
+                // Good path
+                core::hint::black_box(());
             }
             
             else {
-                unsafe{printf(b"Bad...\n\0".as_ptr())};
+                // Causes `PCDrv is not enabled, break HLE will not be executed.` in DuckStation
+                abort();
             }
             Ok(())
         },
@@ -99,35 +101,7 @@ enum State {
 // ====================== STUFF TO MAKE THE PLATFORM RUN ===============================
 // =====================================================================================
 
-//pub mod peripheral;
-
-#[cfg(target_arch="riscv64")]
-mod riscv_startup;
-
-use core::{arch::{asm, global_asm}, panic::PanicInfo};
-
-#[cfg(target_arch="mips")]
-global_asm!(include_str!("printf.s"));
-#[cfg(target_arch="mips")]
-unsafe extern "C" {
-    #[link_name = "tty_printf"]
-    pub fn printf(str: *const u8, ...) -> i32;
-}
-
-#[cfg(target_arch="riscv64")]
-pub unsafe fn printf(mut str: *const u8) -> i32 {
-    use crate::riscv_startup::put_char;
-    use core::ffi::c_char;
-
-    unsafe {
-        while *str != 0 {
-            put_char(*str as c_char);
-            str = str.add(1);
-        }
-    }
-
-    0
-}
+use core::{intrinsics::abort, panic::PanicInfo};
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
