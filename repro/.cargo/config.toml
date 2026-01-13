@@ -11,7 +11,7 @@ riscv_clean = ["clean",                                                         
 riscv_run   = ["run",   "-Zbuild-std=core", "-Zbuild-std-features=compiler-builtins-mem", "--target", "riscv64gc-unknown-none-elf"]
 
 [target.mipsel-sony-psx]
-rustflags = ["-C", "lto=true", "-C", "embed-bitcode=yes", "-C", "codegen-units=1", "-Clink-arg=-Tps-exe.ld", "-Clink-args=-Map=target/app.map", "-Clink-arg=--oformat=binary"]
+rustflags = ["-C", "embed-bitcode=yes", "-C", "codegen-units=1", "-Clink-arg=-Tps-exe.ld", "-Clink-args=-Map=target/app.map", "-Clink-arg=--oformat=binary"]
 
 [target.riscv64gc-unknown-none-elf]
 rustflags = ["-Clink-arg=-Triscv.ld", "-Clink-args=-Map=target/kernel.map"]
