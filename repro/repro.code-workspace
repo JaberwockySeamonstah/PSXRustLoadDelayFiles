@@ -19,6 +19,17 @@
                 "group": "build",
             },
             {
+                "label": "build debug",
+                "type": "shell",
+                "command": "cargo",
+                "args": ["+nightly", "psx_build"],
+                "problemMatcher": [],
+                "presentation": {
+                    "reveal": "always"
+                },
+                "group": "build",
+            },
+            {
                 "label": "check",
                 "type": "shell",
                 "command": "cargo",
